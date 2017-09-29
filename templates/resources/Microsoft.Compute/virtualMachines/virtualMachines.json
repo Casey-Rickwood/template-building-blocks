@@ -94,9 +94,6 @@
                                     },
                                     "source": {
                                         "value": "[variables('updatedSource')[copyIndex()]]"
-                                    },
-                                    "bekUrl": {
-                                        "value": "[reference(resourceId('Microsoft.Compute/virtualMachines/extensions',  variables('updatedSource')[copyIndex()].name, 'AzureDiskEncryption')).instanceView.statuses[0].message]"
                                     }
                                 }
                             }
