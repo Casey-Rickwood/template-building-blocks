@@ -16,8 +16,8 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
-            "name": "[concat(parameters('deploymentContext').parentTemplateUniqueString, '-', variables('source').name, '-ref-', variables('templateUniqueString'))]",
-            "resourceGroup": "[variables('source').resourceGroupName]",
+            "name": "[concat(parameters('deploymentContext').parentTemplateUniqueString, '-', parameters('source').name, '-ref-', variables('templateUniqueString'))]",
+            "resourceGroup": "[parameters('source').resourceGroupName]",
             "properties": {
                 "mode": "Incremental",
                 "template": {
@@ -38,10 +38,10 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
-            "name": "[concat(parameters('deploymentContext').parentTemplateUniqueString, '-', variables('source').name, '-encrypt-', variables('templateUniqueString'))]",
-            "resourceGroup": "[variables('source').resourceGroupName]",
+            "name": "[concat(parameters('deploymentContext').parentTemplateUniqueString, '-', parameters('source').name, '-encrypt-', variables('templateUniqueString'))]",
+            "resourceGroup": "[parameters('source').resourceGroupName]",
             "dependsOn": [
-                "[concat(parameters('deploymentContext').parentTemplateUniqueString, '-', variables('source').name, '-ref-', variables('templateUniqueString'))]"
+                "[concat(parameters('deploymentContext').parentTemplateUniqueString, '-', parameters('source').name, '-ref-', variables('templateUniqueString'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -53,22 +53,22 @@
                         {
                             "apiVersion": "2016-04-30-preview",
                             "type": "Microsoft.Compute/virtualMachines",
-                            "name": "variables('source').name",
+                            "name": "parameters('source').name",
                             "properties": {
                                 "storageProfile": {
                                     "osDisk": {
                                         "encryptionSettings": {
                                             "diskEncryptionKey": {
                                                 "sourceVault": {
-                                                    "id": "[variables('source').encryptionSettings.bekKeyVault]"
+                                                    "id": "[parameters('source').encryptionSettings.bekKeyVault]"
                                                 },
-                                                "secretUrl": "[reference(concat(parameters('deploymentContext').parentTemplateUniqueString, '-', variables('source').name, '-ref-', variables('templateUniqueString')).outputs.bekUrl.value]"
+                                                "secretUrl": "[reference(concat(parameters('deploymentContext').parentTemplateUniqueString, '-', parameters('source').name, '-ref-', variables('templateUniqueString')).outputs.bekUrl.value]"
                                             },
                                             "keyEncryptionKey": {
                                                 "sourceVault": {
-                                                    "id": "[variables('source').encryptionSettings.kekKeyVault]"
+                                                    "id": "[parameters('source').encryptionSettings.kekKeyVault]"
                                                 },
-                                                "keyUrl": "[variables('source').encryptionSettings.kekUrl]"
+                                                "keyUrl": "[parameters('source').encryptionSettings.kekUrl]"
                                             }
                                         }
                                     }
