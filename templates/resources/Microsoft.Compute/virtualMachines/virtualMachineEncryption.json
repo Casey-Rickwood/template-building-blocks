@@ -29,7 +29,7 @@
                     "outputs": {
                         "bekUrl": {
                             "type": "string",
-                            "value": "[reference(resourceId('Microsoft.Compute/virtualMachines/extensions',  parameters('source').name, 'AzureDiskEncryption')).instanceView.statuses[0].message]"
+                            "value": "[reference(resourceId('Microsoft.Compute/virtualMachines/extensions',  parameters('source').name, 'AzureDiskEncryption'), '2016-04-30-preview').instanceView.statuses[0].message]"
                         }
                     }
                 }
