@@ -40,6 +40,7 @@
             "apiVersion": "2017-05-10",
             "name": "[concat(parameters('deploymentContext').parentTemplateUniqueString, '-', parameters('source').name, '-encrypt-', variables('templateUniqueString'))]",
             "resourceGroup": "[parameters('source').resourceGroupName]",
+            "location": "[parameters('source').location]",
             "dependsOn": [
                 "[concat(parameters('deploymentContext').parentTemplateUniqueString, '-', parameters('source').name, '-ref-', variables('templateUniqueString'))]"
             ],
