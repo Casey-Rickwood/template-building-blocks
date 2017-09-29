@@ -29,7 +29,7 @@
                     "outputs": {
                         "bekUrl": {
                             "type": "string",
-                            "value": "[reference(resourceId('Microsoft.Compute/virtualMachines/extensions',  parameters('source').name, 'AzureDiskEncryption'))).instanceView.statuses[0].message]"
+                            "value": "[reference(resourceId('Microsoft.Compute/virtualMachines/extensions',  parameters('source').name, 'AzureDiskEncryption')).instanceView.statuses[0].message]"
                         }
                     }
                 }
@@ -62,7 +62,7 @@
                                                 "sourceVault": {
                                                     "id": "[parameters('source').encryptionSettings.bekKeyVault]"
                                                 },
-                                                "secretUrl": "[reference(concat(parameters('deploymentContext').parentTemplateUniqueString, '-', parameters('source').name, '-ref-', variables('templateUniqueString')).outputs.bekUrl.value]"
+                                                "secretUrl": "[reference(concat(parameters('deploymentContext').parentTemplateUniqueString, '-', parameters('source').name, '-ref-', variables('templateUniqueString'))).outputs.bekUrl.value]"
                                             },
                                             "keyEncryptionKey": {
                                                 "sourceVault": {
