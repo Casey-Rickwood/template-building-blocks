@@ -1167,6 +1167,27 @@ let processorProperties = {
                 adminUsername: value
             }
         };
+    },
+    secrets: (value) => {
+        let secrets = _.map(value, (value) => {
+            return {
+                sourceVault: {
+                    id: value.sourceVault
+                },
+                vaultCertificates: _.map(value.certificates, (value) => {
+                    return {
+                        certificateUrl: value.certificateUrl,
+                        certificateStore: value.certificateStore
+                    };
+                })
+            };
+        });
+
+        return {
+            osProfile: {
+                secrets: secrets
+            }
+        };
     }
 };
 
@@ -1248,10 +1269,9 @@ function transform(settings, buildingBlockSettings) {
                 extensions: [{
                     name: 'AzureDiskEncryption',
                     publisher: 'Microsoft.Azure.Security',
-                    type: 'AzureDiskEncryption',
-                    typeHandlerVersion: '1.1',
+                    type: vmStamp.osType === 'windows' ? 'AzureDiskEncryption' : 'AzureDiskEncryptionForLinux',
+                    typeHandlerVersion: vmStamp.osType === 'windows' ? '1.1' : '0.1',
                     autoUpgradeMinorVersion: true,
-                    forceUpdateTag: '1.0',
                     settings: {
                         AADClientID: vmStamp.osDisk.encryptionSettings.aadClientId,
                         KeyVaultURL: vmStamp.osDisk.encryptionSettings.bekKeyVaultUrl,
@@ -1261,11 +1281,37 @@ function transform(settings, buildingBlockSettings) {
                         EncryptionOperation: 'EnableEncryption'
                     },
                     protectedSettings: {
-                        AADClientSecret: vmStamp.osDisk.encryptionSettings.aadClientSecret
                     }
                 }]
             }];
 
+            if (vmStamp.osType === 'windows') {
+                diskEncryptionExtension[0].extensions[0].forceUpdateTag = '1.0';
+            } else {
+                diskEncryptionExtension[0].extensions[0].settings.SequenceVersion = '1.0';
+            }
+
+            if (vmStamp.osDisk.encryptionSettings.aadClientSecret) {
+                diskEncryptionExtension[0].extensions[0].protectedSettings.AADClientSecret = vmStamp.osDisk.encryptionSettings.aadClientSecret;
+            }
+
+            if (vmStamp.osDisk.encryptionSettings.aadClientCertThumbprint) {
+                diskEncryptionExtension[0].extensions[0].settings.AADClientCertThumbprint = vmStamp.osDisk.encryptionSettings.aadClientCertThumbprint;
+            }
+
+            // If we are linux, we have another "key"
+            if (vmStamp.osDisk.encryptionSettings.passphrase) {
+                diskEncryptionExtension[0].extensions[0].protectedSettings.Passphrase = vmStamp.osDisk.encryptionSettings.passphrase;
+            }
+
+            if (vmStamp.osDisk.encryptionSettings.diskFormatQuery) {
+                // We need to make sure to format the json correctly for the template engine.  We'll assume an array for now.  Validate this!
+                let json = JSON.stringify(vmStamp.osDisk.encryptionSettings.diskFormatQuery);
+                diskEncryptionExtension[0].extensions[0].settings.DiskFormatQuery = `[${json}`;
+                diskEncryptionExtension[0].extensions[0].settings.EncryptionOperation = 'EnableEncryptionFormat';
+            }
+
+            // We need to put this at the end of all of our extensions since they could install things.
             transformedExtensions = transformedExtensions.concat(vmExtensions.transform(diskEncryptionExtension).extensions);
             encryptionSettings = {
                 enabled: true,
